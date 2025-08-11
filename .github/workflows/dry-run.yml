@@ -19,7 +19,7 @@ jobs:
           aws-region: ap-south-1
 
       - name: Validate CloudFormation template
-        run: aws cloudformation validate-template --template-body file://templates/main.yml
+        run: aws cloudformation validate-template --template-body file://templates/main.yaml
 
       - name: Dry run create-change-set
         run: |
