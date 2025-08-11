@@ -1,0 +1,55 @@
+name: Deploy or Delete CloudFormation Stack
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'deploy'
+        type: choice
+        options:
+          - deploy
+          - delete
+
+jobs:
+  deploy:
+    if: ${{ github.event.inputs.action == 'deploy' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1 # change if needed
+
+      - name: Deploy stack
+        run: |
+          aws cloudformation create-stack \
+            --stack-name my-sample-stack \
+            --template-body file://templates/my-template.yaml \
+            --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+          aws cloudformation wait stack-create-complete \
+            --stack-name my-sample-stack
+        shell: bash
+
+  delete:
+    if: ${{ github.event.inputs.action == 'delete' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1 # change if needed
+
+      - name: Delete stack
+        run: |
+          aws cloudformation delete-stack --stack-name my-sample-stack
+          aws cloudformation wait stack-delete-complete --stack-name my-sample-stack
+        shell: bash
