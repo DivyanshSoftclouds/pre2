@@ -31,7 +31,7 @@ jobs:
         if: github.event.inputs.action == 'deploy'
         run: |
           STACK_NAME=demo-ec2-stack
-          TEMPLATE_FILE=template.yaml
+          TEMPLATE_FILE=templates/main.yaml
           echo "Deploying stack..."
           aws cloudformation deploy \
             --stack-name $STACK_NAME \
